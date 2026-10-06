@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>엑셀 템플릿 다운로드</title>
+  <link rel="icon" type="image/png" href="favicon.png" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="page-shell">
+    <header class="site-header">
+      <a href="view.html" id="logo-link" class="logo-link">
+        <div class="logo">
+          <img src="https://www.kangwon.ac.kr/assets/ko/images/logos/logo-color.webp" alt="강원대학교" />
+          <span class="label-status campus" style="color:white;background:#F1B337" aria-label="원주">원주</span>
+          <strong>간호학과 성적 관리</strong>
+        </div>
+      </a>
+      <nav class="global-nav"></nav>
+    </header>
+    <section class="hero">
+      <div class="hero-content">
+        <h1 class="page-main-title">엑셀 템플릿 다운로드</h1>
+        <p class="page-description">아래 버튼을 클릭하면 해당 용도의 엑셀 템플릿 파일이 다운로드됩니다. 성적 입력/수정 페이지의 엑셀 업로드에서 사용하세요.</p>
+      </div>
+    </section>
+
+    <main class="content-grid">
+      <section class="panel">
+        <div class="download-template-buttons" style="display: flex; flex-direction: column; gap: 16px; max-width: 400px;">
+          <a href="핵심술기%20성적%20업로드용.xlsx" download="핵심술기 성적 업로드용.xlsx" class="primary">핵심술기 성적 업로드용.xlsx 다운로드</a>
+          <a href="졸업%20연도%20업로드용.xlsx" download="졸업 연도 업로드용.xlsx" class="primary">졸업 연도 업로드용.xlsx 다운로드</a>
+        </div>
+        <p style="margin-top: 24px; color: var(--text-muted); font-size: 14px;">
+          <strong>핵심술기 성적 업로드용</strong>: 학번, 이름, 졸업연도, 1_활력징후 ~ 18_배액관 관리 열을 포함합니다. 성적 입력/수정 > 엑셀 업로드 탭에서 레벨(L1/L2/L3)을 선택한 뒤 업로드하세요.<br />
+          <strong>졸업 연도 업로드용</strong>: 학번, 졸업연도 열만 포함합니다. 엑셀 업로드 탭에서 "졸업 연도"를 선택한 뒤 업로드하세요.
+        </p>
+      </section>
+    </main>
+    <footer class="site-footer">© 강원대학교 간호학과 - 학사행정 전용 도구</footer>
+  </div>
+  <script src="js/auth.js"></script>
+  <script src="js/nav.js"></script>
+</body>
+</html>

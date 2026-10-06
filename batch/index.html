@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>학기 선택</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="page-shell">
+    <header class="site-header">
+      <a href="index.html" class="logo-link">
+        <div class="logo">
+          <img src="https://www.kangwon.ac.kr/assets/ko/images/logos/logo-color.webp" alt="강원대학교" />
+          <span class="label-status campus" style="color:white;background:#F1B337" aria-label="원주">원주</span>
+          <strong>간호학과 실습 배치</strong>
+        </div>
+      </a>
+    </header>
+
+    <section class="hero">
+      <div class="hero-content">
+        <h1 class="page-main-title">학기 선택</h1>
+        <p class="page-description">배치 설정을 시작할 학기를 선택하세요.</p>
+      </div>
+    </section>
+
+    <main class="content-grid">
+      <section class="panel">
+        <div class="semester-selection">
+          <div class="semester-grid">
+            <article class="semester-card" data-grade="3" data-semester="1" tabindex="0" role="button">
+              <h3>3학년 1학기</h3>
+              <p>3학년 1학기 실습 배치</p>
+            </article>
+            <article class="semester-card" data-grade="3" data-semester="2" tabindex="0" role="button">
+              <h3>3학년 2학기</h3>
+              <p>3학년 2학기 실습 배치</p>
+            </article>
+            <article class="semester-card" data-grade="4" data-semester="1" tabindex="0" role="button">
+              <h3>4학년 1학기</h3>
+              <p>4학년 1학기 실습 배치</p>
+            </article>
+            <article class="semester-card" data-grade="4" data-semester="2" tabindex="0" role="button">
+              <h3>4학년 2학기</h3>
+              <p>4학년 2학기 실습 배치</p>
+            </article>
+          </div>
+          <div class="semester-actions">
+            <a href="https://github.com/CodeSensory/CodeSensory.github.io/releases/download/v1.0.0/wonju_batch.exe" download="wonju_batch.exe" class="btn">배치 프로그램 다운로드</a>
+            <a href="json-edit.html" class="btn primary">JSON 수정</a>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <p>문의: codesensory@gmail.com</p>
+    </footer>
+  </div>
+
+  <script src="js/batch-common.js"></script>
+  <script src="js/index.js"></script>
+</body>
+</html>

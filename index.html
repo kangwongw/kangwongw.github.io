@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="ko">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>간호학과 성적 관리</title>
+  <link rel="icon" type="image/png" href="favicon.png" />
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+</head>
+
+<body>
+  <p style="padding: 20px;">이동 중...</p>
+  <script src="config.js"></script>
+  <script src="js/db-utils.js"></script>
+  <script src="js/auth.js"></script>
+  <script>
+    // 스크립트가 모두 로드된 후 리다이렉트
+    (function() {
+      // 현재 페이지가 index.html인지 확인
+      var currentPage = window.location.pathname.split('/').pop() || 'index.html';
+      if (currentPage !== 'index.html' && currentPage !== '') {
+        return; // index.html이 아니면 리다이렉트하지 않음
+      }
+      
+      function redirect() {
+        // Auth 객체가 로드되었는지 확인
+        if (typeof Auth !== 'undefined' && typeof Auth.getSession === 'function') {
+          var session = Auth.getSession();
+          if (session) {
+            window.location.href = 'view.html';
+          } else {
+            window.location.href = 'login.html';
+          }
+        } else {
+          // Auth 객체가 아직 로드되지 않았으면 재시도
+          setTimeout(redirect, 50);
+        }
+      }
+      
+      // DOM이 로드된 후 실행
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', redirect);
+      } else {
+        redirect();
+      }
+    })();
+  </script>
+</body>
+
+</html>

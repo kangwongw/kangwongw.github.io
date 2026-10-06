@@ -1,0 +1,22 @@
+/**
+ * 가입 요청 / 비밀번호 초기화 요청 / 비밀번호 재설정 시 EmailJS를 통해 관리자에게 이메일 알림 발송.
+ * EmailJS 설정이 필요합니다:
+ * 1. https://www.emailjs.com 에서 계정 생성
+ * 2. Email Service 생성 (Gmail, Outlook 등)
+ * 3. Email Template 생성
+ * 4. 아래 ADMIN_EMAIL과 EmailJS 설정값을 입력하세요.
+ * 실패해도 사용자 화면에는 영향 없음 (조용히 무시).
+ */
+
+// 관리자 이메일 주소 (여기에 본인의 이메일 주소를 입력하세요)
+const ADMIN_EMAIL = 'your-email@example.com';
+
+// EmailJS 설정 (EmailJS 대시보드에서 확인 가능)
+const EMAILJS_SERVICE_ID = 'YOUR_SERVICE_ID'; // EmailJS Service ID
+const EMAILJS_TEMPLATE_ID = 'YOUR_TEMPLATE_ID'; // EmailJS Template ID (관리자 알림용)
+const EMAILJS_PUBLIC_KEY = 'YOUR_PUBLIC_KEY'; // EmailJS Public Key
+
+// 사용자에게 보내는 이메일용 템플릿 ID (승인 알림용)
+const EMAILJS_USER_TEMPLATE_ID = 'YOUR_USER_TEMPLATE_ID'; // 사용자 알림용 Template ID (여기에 사용자 알림용 템플릿 ID 입력)
+
+// ... (나머지 코드는 동일) ...

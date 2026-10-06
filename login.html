@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="ko">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>로그인 - 간호학과 성적 관리</title>
+  <link rel="icon" type="image/png" href="favicon.png" />
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+</head>
+
+<body>
+  <div class="page-shell">
+    <header class="site-header auth-header">
+      <a href="index.html" id="logo-link" class="logo-link">
+        <div class="logo">
+          <img src="https://www.kangwon.ac.kr/assets/ko/images/logos/logo-color.webp" alt="강원대학교" />
+          <span class="label-status campus" style="color:white;background:#F1B337" aria-label="원주">원주</span>
+          <strong>간호학과 성적 관리</strong>
+        </div>
+      </a>
+    </header>
+
+    <section class="hero">
+      <div class="hero-content">
+        <h1 class="page-main-title">로그인</h1>
+        <p class="page-description">아이디와 비밀번호를 입력하세요.</p>
+      </div>
+    </section>
+
+    <main class="content-grid">
+      <section class="panel auth-panel">
+        <form id="login-form" class="auth-form">
+          <label>
+            아이디
+            <input type="text" id="login-username" name="username" required autocomplete="username" placeholder="아이디 입력" />
+          </label>
+          <label>
+            비밀번호
+            <input type="password" id="login-password" name="password" required autocomplete="current-password" placeholder="비밀번호 입력" />
+          </label>
+          <div class="auth-form-actions">
+            <button type="submit" class="primary">로그인</button>
+          </div>
+        </form>
+        <div class="auth-links">
+          <a href="signup.html">회원가입</a>
+          <a href="reset-request.html">비밀번호 초기화 요청</a>
+          <a href="reset-password.html">비밀번호 재설정</a>
+        </div>
+        <div class="status" id="login-status"></div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      © 강원대학교 간호학과 - 학사행정 전용 도구</br>문의: codesensory@gmail.com
+    </footer>
+  </div>
+
+  <script src="config.js"></script>
+  <script src="js/db-utils.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/login.js"></script>
+</body>
+
+</html>

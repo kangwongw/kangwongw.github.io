@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>JSON 수정</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="page-shell">
+    <header class="site-header">
+      <a href="index.html" class="logo-link">
+        <div class="logo">
+          <img src="https://www.kangwon.ac.kr/assets/ko/images/logos/logo-color.webp" alt="강원대학교" />
+          <span class="label-status campus" style="color:white;background:#F1B337" aria-label="원주">원주</span>
+          <strong>간호학과 실습 배치</strong>
+        </div>
+      </a>
+    </header>
+
+    <section class="hero">
+      <div class="hero-content">
+        <nav class="breadcrumbs" aria-label="경로">
+          <a href="index.html">학기 선택</a>
+          <span class="sep">&gt;</span>
+          <span>JSON 수정</span>
+        </nav>
+        <h1 class="page-main-title">JSON 수정</h1>
+        <p class="page-description">배치 실패 시 저장해 둔 web_config.json을 업로드하고 최대 인원 값을 조정합니다.</p>
+      </div>
+    </section>
+
+    <main class="content-grid">
+      <section class="panel">
+        <h2>JSON 파일 업로드</h2>
+        <label id="json-upload-zone" class="json-upload-zone" for="json-file">
+          <span class="json-upload-title">web_config.json 선택</span>
+          <span id="json-upload-name" class="muted">클릭해서 수정할 JSON 파일을 업로드하세요.</span>
+        </label>
+        <input id="json-file" class="visually-hidden" type="file" accept=".json,application/json" />
+        <p id="json-edit-message" class="muted">JSON 파일을 업로드하면 summary 형식으로 표시됩니다.</p>
+      </section>
+
+      <section id="json-edit-content" class="hidden">
+        <section class="panel">
+          <h2>기본 설정</h2>
+          <div class="table-wrap">
+            <table class="table">
+              <tbody id="json-basic-tbody"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="panel">
+          <h2>최대 인원 수정</h2>
+        <p class="muted">A/B반 인원 수, 기간별 반, 최대 인원을 수정할 수 있습니다. 3-1은 내과/외과와 병원별 중복허용도 수정할 수 있습니다.</p>
+          <div class="table-wrap">
+            <table class="table editable-config-table">
+              <thead id="json-max-head"></thead>
+              <tbody id="json-max-body"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <div class="actions panel-actions">
+          <a href="index.html" class="btn">이전</a>
+          <button type="button" id="download-json" class="btn primary">수정된 web_config.json 저장</button>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <p>문의: codesensory@gmail.com</p>
+    </footer>
+  </div>
+
+  <script src="js/batch-common.js"></script>
+  <script src="js/page-1a-shared.js"></script>
+  <script src="js/json-edit.js"></script>
+</body>
+</html>

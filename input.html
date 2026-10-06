@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="ko">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>학생 성적 입력</title>
+  <link rel="icon" type="image/png" href="favicon.png" />
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+</head>
+
+<body>
+  <div class="page-shell">
+    <header class="site-header">
+      <a href="view.html" id="logo-link" class="logo-link">
+        <div class="logo">
+          <img src="https://www.kangwon.ac.kr/assets/ko/images/logos/logo-color.webp" alt="강원대학교" />
+          <span class="label-status campus" style="color:white;background:#F1B337" aria-label="원주">원주</span>
+          <strong>간호학과 성적 관리</strong>
+        </div>
+      </a>
+      <nav class="global-nav"></nav>
+    </header>
+
+    <section class="hero">
+      <div class="hero-content">
+        <h1 class="page-main-title">성적 입력 및 수정</h1>
+        <p class="page-description">강원대학교 간호학과 학생 성적을 입력하고 수정할 수 있습니다.</p>
+      </div>
+    </section>
+
+    <main class="content-grid">
+      <section class="panel input-panel">
+        <div class="tabs">
+          <button class="tab-button active" data-tab="manual">직접 입력</button>
+          <button class="tab-button" data-tab="excel">엑셀 업로드</button>
+        </div>
+
+        <div class="tab-content active" id="manual-tab">
+          <form id="manual-form" class="input-form">
+            <div class="form-section">
+              <h3 class="section-title">학생 정보</h3>
+              <div class="form-row">
+                <label class="form-label">
+                  <span class="label-text">학번</span>
+                  <input type="text" id="student-id-input" name="studentId" required maxlength="20" placeholder="예: 20250001" class="form-input" />
+                </label>
+                <label class="form-label">
+                  <span class="label-text">이름</span>
+                  <input type="text" id="student-name-input" name="studentName" maxlength="100" placeholder="예: 홍길동" class="form-input" />
+                </label>
+                <label class="form-label">
+                  <span class="label-text">졸업 연도</span>
+                  <input type="number" id="graduate-year-input" name="graduateYear" min="2000" max="2100" step="1" placeholder="예: 2025" class="form-input" />
+                </label>
+                <label class="form-label">
+                  <span class="label-text">레벨 선택</span>
+                  <select id="level-select" name="level" required class="form-select">
+                    <option value="l1">L1</option>
+                    <option value="l2">L2</option>
+                    <option value="l3">L3</option>
+                  </select>
+                </label>
+              </div>
+              <div class="status" id="search-status"></div>
+            </div>
+            
+            <div class="form-section">
+              <h3 class="section-title">과목별 성적 입력</h3>
+              <div class="table-container">
+                <table id="manual-grade-table" class="grade-table">
+                  <thead>
+                    <tr>
+                      <th>과목</th>
+                      <th>점수</th>
+                      <th>연도</th>
+                      <th>과목명</th>
+                      <th>달성도</th>
+                    </tr>
+                  </thead>
+                  <tbody id="subjects-tbody">
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            
+            <div class="form-section">
+              <h3 class="section-title">비고</h3>
+              <label class="form-label-full">
+                <textarea id="note-input" name="note" rows="3" placeholder="기타 내용을 입력하세요" class="form-textarea"></textarea>
+              </label>
+            </div>
+
+            <div class="form-actions">
+              <button class="primary" type="submit">성적 저장</button>
+              <button class="secondary" type="button" id="reset-btn">초기화</button>
+              <button class="secondary danger" type="button" id="delete-student-btn" style="display: none;">학생 정보 삭제</button>
+            </div>
+            <div class="status" id="manual-status"></div>
+          </form>
+        </div>
+
+        <div class="tab-content" id="excel-tab">
+          <div class="form-section">
+            <h3 class="section-title">엑셀 파일 업로드</h3>
+            <div class="info-box">
+              <p class="info-text">학번, 과목, 달성도 헤더를 가진 xlsx 파일을 업로드하세요.</p>
+              <p class="info-text-small">예: 학번, 1_활력징후, 2_경구투약 형식으로 입력 가능합니다.</p>
+              <p class="info-text-small">연도와 과목명을 입력하면 모든 점수에 동일하게 적용됩니다.</p>
+              <p class="info-text-warning">⚠️ 빨간색 테두리로 표시된 입력창은 필수 입력 항목입니다.</p>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <h3 class="section-title">업로드 설정</h3>
+            <div class="form-row">
+              <label class="form-label">
+                <span class="label-text">레벨 선택</span>
+                <select id="excel-level-select" name="excelLevel" required class="form-select">
+                  <option value="l1">L1</option>
+                  <option value="l2">L2</option>
+                  <option value="l3">L3</option>
+                  <option value="graduate_year">졸업연도</option>
+                </select>
+              </label>
+            </div>
+            
+            <div class="form-row">
+              <p class="info-text-small" style="margin-bottom: 16px;">업로드하는 모든 점수에 동일한 연도와 과목명이 적용됩니다.</p>
+              <label class="form-label">
+                <span class="label-text">연도</span>
+                <input 
+                  type="number" 
+                  id="excel-year-input" 
+                  min="2000" 
+                  max="2100" 
+                  step="1" 
+                  placeholder="예: 2025"
+                  class="form-input"
+                  required
+                />
+              </label>
+              <label class="form-label">
+                <span class="label-text">과목명</span>
+                <input 
+                  type="text" 
+                  id="excel-subject-name-input" 
+                  placeholder="예: 기초간호학"
+                  class="form-input"
+                  required
+                />
+              </label>
+            </div>
+          </div>
+          
+          <div class="form-section">
+            <h3 class="section-title">파일 선택</h3>
+            <input type="file" id="xlsx-input" accept=".xlsx,.xls" class="file-input" />
+            <div class="form-actions">
+              <button class="primary" id="upload-btn" type="button">파일 업로드 및 미리보기</button>
+            </div>
+            <div class="status" id="upload-status"></div>
+          </div>
+
+          <details class="form-section excel-template-download-section">
+            <summary class="excel-template-summary">엑셀 템플릿 다운로드</summary>
+            <div class="excel-template-download-content">
+              <p class="info-text" style="margin-bottom: 12px;">아래 버튼을 클릭하면 해당 용도의 엑셀 템플릿 파일이 다운로드됩니다. 채워 넣은 뒤 이 탭의 「파일 업로드 및 미리보기」에서 업로드하세요.</p>
+              <div class="download-template-buttons" style="display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 8px;">
+                <a href="핵심술기%20성적%20업로드용.xlsx" download="핵심술기 성적 업로드용.xlsx" class="primary">핵심술기 성적 업로드용.xlsx 다운로드</a>
+                <a href="졸업%20연도%20업로드용.xlsx" download="졸업 연도 업로드용.xlsx" class="primary">졸업 연도 업로드용.xlsx 다운로드</a>
+              </div>
+              <p class="info-text-small" style="color: var(--text-muted);">
+                <strong>핵심술기 성적 업로드용</strong>: 학번, 이름, 졸업연도, 1_활력징후 ~ 18_배액관 관리 열 포함. 레벨(L1/L2/L3) 선택 후 업로드.<br />
+                <strong>졸업 연도 업로드용</strong>: 학번, 졸업연도 열만 포함. 위 레벨 선택에서 「졸업연도」 선택 후 업로드.
+              </p>
+            </div>
+          </details>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      © 강원대학교 간호학과 - 학사행정 전용 도구</br>문의: codesensory@gmail.com
+    </footer>
+  </div>
+
+  <script src="config.js"></script>
+  <script src="js/db-utils.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/input.js"></script>
+  <script src="js/nav.js"></script>
+</body>
+
+</html>
+

@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>1-A 최대 인원 입력</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="page-shell">
+    <header class="site-header">
+      <a href="index.html" class="logo-link">
+        <div class="logo">
+          <img src="https://www.kangwon.ac.kr/assets/ko/images/logos/logo-color.webp" alt="강원대학교" />
+          <span class="label-status campus" style="color:white;background:#F1B337" aria-label="원주">원주</span>
+          <strong>간호학과 실습 배치</strong>
+        </div>
+      </a>
+    </header>
+
+    <section class="hero">
+      <div class="hero-content">
+        <nav class="breadcrumbs" aria-label="경로">
+          <a href="index.html">학기 선택</a>
+          <span class="sep">&gt;</span>
+          <a href="config.html">배치 입력</a>
+          <span class="sep">&gt;</span>
+          <span>1-A 최대 인원</span>
+        </nav>
+        <h1 class="page-main-title">1-A 최대 인원 입력</h1>
+        <p class="page-description">과목·병원별 기간별 최대 인원을 입력합니다.</p>
+      </div>
+    </section>
+
+    <main class="content-grid">
+      <section class="panel">
+        <div class="panel-toolbar">
+          <h2>과목/병원별 기간별 최대 인원</h2>
+          <div class="panel-toolbar-actions">
+            <div id="semester-toggle-container" class="semester-toggle">
+              <label for="semester-toggle" class="muted">학기</label>
+              <select id="semester-toggle" class="select">
+                <option value="1">1학기</option>
+                <option value="2">2학기</option>
+              </select>
+            </div>
+            <button type="button" id="add-row" class="btn">행 추가</button>
+          </div>
+        </div>
+
+        <form id="one-a-max-form" class="form-grid" autocomplete="off">
+          <div id="instruction-text" class="field full-width">
+            <p class="muted">예: 과목1, 병원1, 4, 4, 4, 4, 0, 0, 0 (기간 수 만큼 입력)</p>
+          </div>
+          <div id="instruction-text-grade3" class="field full-width hidden">
+            <p class="muted">병원명과 부서명을 입력하고, 내과/외과 유형을 선택하세요.</p>
+          </div>
+          <div id="instruction-text-subject" class="field full-width hidden">
+            <p class="muted">예: 임상심화실습1, 원주세브란스기독병원, 72병동, 4, 4, 0 … — 같은 병원이 여러 행이면 부서명을 반드시 입력하세요.</p>
+          </div>
+
+          <section id="max-rows" class="field full-width panel-inner">
+            <p id="max-empty" class="muted">행이 없습니다. "행 추가"를 눌러 시작하세요.</p>
+          </section>
+
+          <div class="actions">
+            <a href="config.html" class="btn">이전</a>
+            <a href="#" id="go-summary" class="btn primary">다음 (요약)</a>
+          </div>
+        </form>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <p>문의: codesensory@gmail.com</p>
+    </footer>
+  </div>
+
+  <script src="js/batch-common.js"></script>
+  <script src="js/page-1a-shared.js"></script>
+  <script src="js/page-1a-max.js"></script>
+</body>
+</html>

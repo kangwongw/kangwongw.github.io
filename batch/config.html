@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>배치 입력 페이지</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="page-shell">
+    <header class="site-header">
+      <a href="index.html" class="logo-link">
+        <div class="logo">
+          <img src="https://www.kangwon.ac.kr/assets/ko/images/logos/logo-color.webp" alt="강원대학교" />
+          <span class="label-status campus" style="color:white;background:#F1B337" aria-label="원주">원주</span>
+          <strong>간호학과 실습 배치</strong>
+        </div>
+      </a>
+    </header>
+
+    <section class="hero">
+      <div class="hero-content">
+        <nav class="breadcrumbs" aria-label="경로">
+          <a href="index.html">학기 선택</a>
+          <span class="sep">&gt;</span>
+          <span>배치 입력</span>
+        </nav>
+        <h1 class="page-main-title">배치 파라미터 입력</h1>
+        <p class="page-description">학생 수와 기간별 반·학기 정보를 입력합니다.</p>
+      </div>
+    </section>
+
+    <main class="content-grid">
+      <section class="panel">
+        <div class="panel-toolbar">
+          <h2>입력 폼</h2>
+          <span id="selected-semester-info" class="semester-badge"></span>
+        </div>
+
+        <form id="config-form" class="form-grid">
+          <div class="field">
+            <label class="field-label" for="num-a">A반 학생 수</label>
+            <input id="num-a" name="numA" type="number" min="0" placeholder="예: 40" required />
+          </div>
+
+          <div class="field">
+            <label class="field-label" for="num-b">B반 학생 수</label>
+            <input id="num-b" name="numB" type="number" min="0" placeholder="예: 40" required />
+          </div>
+
+          <div class="field">
+            <label class="field-label" for="num-periods">기간 수</label>
+            <input id="num-periods" name="numPeriods" type="number" min="1" placeholder="예: 7" required />
+          </div>
+
+          <div class="field inline">
+            <button type="button" id="build-periods" class="btn">기간별 입력 생성</button>
+          </div>
+
+          <section id="period-assignments" class="panel-inner full-width field">
+            <p id="period-assignments-hint" class="muted">"기간별 입력 생성" 버튼을 눌러 기간별 반/학기 선택을 만들어주세요.</p>
+          </section>
+
+          <div class="actions">
+            <a href="index.html" class="btn">이전</a>
+            <a href="page-1a.html" id="go-1a" class="btn primary">다음 (1-A 설정)</a>
+          </div>
+        </form>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <p>문의: codesensory@gmail.com</p>
+    </footer>
+  </div>
+
+  <script src="js/batch-common.js"></script>
+  <script src="js/config.js"></script>
+</body>
+</html>

@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="ko">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>게시글 상세</title>
+  <link rel="icon" type="image/png" href="favicon.png" />
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+</head>
+
+<body>
+  <div class="page-shell">
+    <header class="site-header">
+      <a href="view.html" id="logo-link" class="logo-link">
+        <div class="logo">
+          <img src="https://www.kangwon.ac.kr/assets/ko/images/logos/logo-color.webp" alt="강원대학교" />
+          <span class="label-status campus" style="color:white;background:#F1B337" aria-label="원주">원주</span>
+          <strong>간호학과 성적 관리</strong>
+        </div>
+      </a>
+      <nav class="global-nav"></nav>
+    </header>
+
+    <section class="hero">
+      <div class="hero-content">
+        <h1 class="page-main-title">게시글 상세</h1>
+        <p class="page-description">게시글의 상세 내용을 확인할 수 있습니다.</p>
+      </div>
+    </section>
+
+    <main class="content-grid">
+      <section class="panel">
+        <div class="toolbar" style="margin-bottom: 16px;">
+          <button class="secondary" type="button" id="back-btn">← 목록으로</button>
+          <button class="secondary danger" type="button" id="delete-btn" style="margin-left: auto; background-color: #dc3545; color: white; border-color: #dc3545;">삭제</button>
+        </div>
+        <div class="status" id="board-status"></div>
+        
+        <article id="board-detail-card">
+          <div class="board-detail-header" style="margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid var(--border-color);">
+            <div>
+              <h2 id="board-detail-title" style="margin: 0 0 8px 0; font-size: 24px;"></h2>
+              <p id="board-detail-meta" style="margin: 0; color: var(--text-muted);"></p>
+            </div>
+            <div class="board-detail-views" style="margin-top: 16px;">
+              조회수 <span id="board-detail-views">0</span>
+            </div>
+          </div>
+          <div id="board-detail-body" style="min-height: 200px; line-height: 1.6; white-space: pre-wrap; word-wrap: break-word;"></div>
+        </article>
+        <nav class="board-detail-prev-next" aria-label="이전글 다음글" style="margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--border-color); display: flex; flex-wrap: wrap; gap: 12px; align-items: center;">
+          <div id="board-prev-link" style="flex: 1; min-width: 0;"></div>
+          <div id="board-next-link" style="flex: 1; min-width: 0; text-align: right;"></div>
+        </nav>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      © 강원대학교 간호학과 - 학사행정 전용 도구</br>문의: codesensory@gmail.com
+    </footer>
+  </div>
+
+  <script src="config.js"></script>
+  <script src="js/db-utils.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/board-detail.js"></script>
+  <script src="js/nav.js"></script>
+</body>
+
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

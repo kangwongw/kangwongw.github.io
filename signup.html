@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="ko">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>회원가입 - 간호학과 성적 관리</title>
+  <link rel="icon" type="image/png" href="favicon.png" />
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+</head>
+
+<body>
+  <div class="page-shell">
+    <header class="site-header auth-header">
+      <a href="view.html" id="logo-link" class="logo-link">
+        <div class="logo">
+          <img src="https://www.kangwon.ac.kr/assets/ko/images/logos/logo-color.webp" alt="강원대학교" />
+          <span class="label-status campus" style="color:white;background:#F1B337" aria-label="원주">원주</span>
+          <strong>간호학과 성적 관리</strong>
+        </div>
+      </a>
+    </header>
+
+    <section class="hero">
+      <div class="hero-content">
+        <h1 class="page-main-title">회원가입</h1>
+        <p class="page-description">이메일, 비밀번호, 이름, 직함을 입력하세요.</p>
+      </div>
+    </section>
+
+    <main class="content-grid">
+      <section class="panel auth-panel">
+        <form id="signup-form" class="auth-form">
+          <label>
+            이메일
+            <input type="email" id="signup-email" name="email" required autocomplete="email" placeholder="example@email.com" />
+          </label>
+          <label>
+            비밀번호
+            <input type="password" id="signup-password" name="password" required autocomplete="new-password" placeholder="비밀번호" minlength="6" />
+          </label>
+          <label>
+            비밀번호 확인
+            <input type="password" id="signup-password-confirm" name="password_confirm" required autocomplete="new-password" placeholder="비밀번호 확인" />
+          </label>
+          <label>
+            이름
+            <input type="text" id="signup-name" name="name" required placeholder="이름" />
+          </label>
+          <label>
+            직함
+            <input type="text" id="signup-title" name="title" placeholder="직함 (선택)" />
+          </label>
+          <div class="auth-form-actions">
+            <button type="submit" class="primary">가입하기</button>
+          </div>
+        </form>
+        <div class="auth-links">
+          <a href="login.html">로그인</a>
+          <a href="reset-request.html">비밀번호 초기화 요청</a>
+        </div>
+        <div class="status" id="signup-status"></div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      © 강원대학교 간호학과 - 학사행정 전용 도구
+    </footer>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+  <script src="config.js"></script>
+  <script src="js/db-utils.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/notify-request.js"></script>
+  <script src="js/signup.js"></script>
+</body>
+
+</html>

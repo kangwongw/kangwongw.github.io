@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="ko">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>새 글 작성</title>
+  <link rel="icon" type="image/png" href="favicon.png" />
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+</head>
+
+<body>
+  <div class="page-shell">
+    <header class="site-header">
+      <a href="view.html" id="logo-link" class="logo-link">
+        <div class="logo">
+          <img src="https://www.kangwon.ac.kr/assets/ko/images/logos/logo-color.webp" alt="강원대학교" />
+          <span class="label-status campus" style="color:white;background:#F1B337" aria-label="원주">원주</span>
+          <strong>간호학과 성적 관리</strong>
+        </div>
+      </a>
+      <nav class="global-nav"></nav>
+    </header>
+
+    <section class="hero">
+      <div class="hero-content">
+        <h1 class="page-main-title">새 글 작성</h1>
+        <p class="page-description">필요한 안내 사항을 작성해 주세요.</p>
+      </div>
+    </section>
+
+    <main class="content-grid">
+      <section class="panel">
+        <div class="toolbar" style="margin-bottom: 16px;">
+          <button class="secondary" type="button" id="back-btn">← 목록으로</button>
+        </div>
+        
+        <form id="board-form" class="board-form">
+          <label>
+            제목
+            <input type="text" id="board-title" name="title" placeholder="제목을 입력하세요" required />
+          </label>
+          <label>
+            작성자
+            <input type="text" id="board-author" name="author" placeholder="[직함]이름 (로그인 정보)" readonly />
+          </label>
+          <label>
+            내용
+            <textarea id="board-content" name="content" rows="10" placeholder="내용을 입력하세요" required style="min-height: 300px;"></textarea>
+          </label>
+          <div class="toolbar" style="justify-content: flex-end; margin-top: 16px;">
+            <button class="secondary" type="button" id="cancel-btn">취소</button>
+            <button class="primary" type="submit">등록하기</button>
+          </div>
+          <div class="status" id="board-form-status"></div>
+        </form>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      © 강원대학교 간호학과 - 학사행정 전용 도구</br>문의: codesensory@gmail.com
+    </footer>
+  </div>
+
+  <script src="config.js"></script>
+  <script src="js/db-utils.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/board-write.js"></script>
+  <script src="js/nav.js"></script>
+</body>
+
+</html>
+
+
+
+
+
+
+
+
+
+
+
