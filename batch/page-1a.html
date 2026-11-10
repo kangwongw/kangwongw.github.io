@@ -25,6 +25,8 @@
           <span class="sep">&gt;</span>
           <a href="config.html">배치 입력</a>
           <span class="sep">&gt;</span>
+          <a href="page-1a-method.html">입력 방식</a>
+          <span class="sep">&gt;</span>
           <span>1-A 최대 인원</span>
         </nav>
         <h1 class="page-main-title">1-A 최대 인원 입력</h1>
@@ -37,26 +39,19 @@
         <div class="panel-toolbar">
           <h2>과목/병원별 기간별 최대 인원</h2>
           <div class="panel-toolbar-actions">
-            <div id="semester-toggle-container" class="semester-toggle">
-              <label for="semester-toggle" class="muted">학기</label>
-              <select id="semester-toggle" class="select">
-                <option value="1">1학기</option>
-                <option value="2">2학기</option>
-              </select>
-            </div>
             <button type="button" id="add-row" class="btn">행 추가</button>
           </div>
         </div>
 
         <form id="one-a-max-form" class="form-grid" autocomplete="off">
-          <div id="instruction-text" class="field full-width">
-            <p class="muted">예: 과목1, 병원1, 4, 4, 4, 4, 0, 0, 0 (기간 수 만큼 입력)</p>
-          </div>
           <div id="instruction-text-grade3" class="field full-width hidden">
-            <p class="muted">병원명과 부서명을 입력하고, 내과/외과 유형을 선택하세요.</p>
+            <p class="muted">병원을 추가해 과목명과 병원명을 적고, 병원마다 부서를 필요한 만큼 추가해 부서별 내과/외과 유형과 기간별 최대 인원을 입력하세요. 새 병원의 과목명은 바로 앞 병원의 과목명으로 채워집니다. 중복허용은 병원 단위로 적용됩니다.</p>
           </div>
           <div id="instruction-text-subject" class="field full-width hidden">
             <p class="muted">예: 임상심화실습1, 원주세브란스기독병원, 72병동, 4, 4, 0 … — 같은 병원이 여러 행이면 부서명을 반드시 입력하세요.</p>
+          </div>
+          <div id="instruction-text-branch" class="field full-width hidden">
+            <p class="muted">분야(예: <span id="branch-example">아동, 모성</span>)는 과목 안에서 나뉘는 영역이며 비워 둘 수 있습니다. 분야가 달라도 같은 과목으로 계산하고, 배치 결과표에 함께 표시됩니다.</p>
           </div>
 
           <section id="max-rows" class="field full-width panel-inner">
@@ -64,7 +59,7 @@
           </section>
 
           <div class="actions">
-            <a href="config.html" class="btn">이전</a>
+            <a href="page-1a-method.html" class="btn">이전</a>
             <a href="#" id="go-summary" class="btn primary">다음 (요약)</a>
           </div>
         </form>
@@ -78,6 +73,7 @@
 
   <script src="js/batch-common.js"></script>
   <script src="js/page-1a-shared.js"></script>
+  <script src="js/page-1a-hospital.js"></script>
   <script src="js/page-1a-max.js"></script>
 </body>
 </html>

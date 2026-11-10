@@ -1,12 +1,23 @@
 (function () {
-  const { readConfig, getContext, downloadJSON, createEl, formatAssignmentSemester } = BatchCommon;
-  const { deptTypeLabel } = Page1AShared;
+  if (BatchCommon.redirectIfNoSemester()) return;
+
+  const {
+    readConfig,
+    getContext,
+    getInputMethod,
+    deptTypeLabel,
+    groupByHospital,
+    buildWebConfig,
+    downloadJSON,
+    createEl,
+    formatAssignmentSemester
+  } = BatchCommon;
 
   const store = readConfig();
   const ctx = getContext();
   const numA = store.numA || 0;
   const numB = store.numB || 0;
-  const numPeriods = Number(store.numPeriods || store?.oneA?.numPeriods || 0);
+  const numPeriods = Number(store.numPeriods || 0);
   const assignments = Array.isArray(store.assignments) ? store.assignments : [];
   const maxData = store?.oneA?.max || [];
 
@@ -25,6 +36,45 @@
     return createEl('th', null, text);
   }
 
+  function rowTotal(row) {
+    let total = 0;
+    for (let p = 0; p < numPeriods; p++) total += row.values?.[p] || 0;
+    return total;
+  }
+
+  /** 3학년 1학기: 병원 칸을 부서 수만큼 합치고 총인원·중복허용을 함께 적는다 */
+  function hospitalCell(group) {
+    const rows = group.indexes.map((i) => maxData[i]);
+    const total = rows.reduce((sum, row) => sum + rowTotal(row), 0);
+    const meta = [`총인원 ${total}`, rows.some((row) => row.allowDuplicate) ? '중복허용' : '']
+      .filter(Boolean)
+      .join(' · ');
+    const cell = td(group.hospital);
+    cell.rowSpan = rows.length;
+    cell.appendChild(createEl('span', 'hospital-cell-meta', meta));
+    return cell;
+  }
+
+  /** 3학년 1학기: 과목 칸도 병원의 부서 수만큼 합친다 */
+  function subjectCell(group) {
+    const cell = td(maxData[group.indexes[0]].subject || '');
+    cell.rowSpan = group.indexes.length;
+    return cell;
+  }
+
+  // 3학년 1학기는 병원별로 묶어 첫 부서 행에만 병원 칸을 둔다
+  const orderedRows = ctx.isGrade3S1
+    ? groupByHospital(maxData).flatMap((group) =>
+      group.indexes.map((index, pos) => ({ maxRow: maxData[index], group: pos === 0 ? group : null })))
+    : maxData.map((maxRow) => ({ maxRow, group: null }));
+
+  const inputMethod = getInputMethod();
+  const methodCrumb = document.getElementById('input-method-crumb');
+  const prevLink = document.getElementById('summary-prev');
+  methodCrumb.href = inputMethod.page;
+  methodCrumb.textContent = inputMethod.label;
+  prevLink.href = inputMethod.page;
+
   [
     ['A반 학생 수', String(numA)],
     ['B반 학생 수', String(numB)],
@@ -41,7 +91,14 @@
     if (a && a.period != null) periodToAssign.set(Number(a.period), a);
   });
 
-  const infoCols = ctx.isGrade3S1 ? 3 : (ctx.usesSubjectMode ? 3 : 2);
+  // 과목 안의 분야(예: 아동·모성)가 있으면 분야 열을 함께 보여 준다
+  const showBranch = !ctx.isGrade3S1 && maxData.some((row) => row.branch);
+  const subjectHeaders = showBranch ? ['과목', '분야', '병원', '부서'] : ['과목', '병원', '부서'];
+  // 3학년 1학기: 과목명이 있는 자료면 병원 왼쪽에 과목 열을 둔다
+  const showSubject31 = ctx.isGrade3S1 && maxData.some((row) => row.subject);
+  const grade31Headers = [...(showSubject31 ? ['과목'] : []), '병원', '부서', '내과/외과'];
+  const infoHeaders = ctx.isGrade3S1 ? grade31Headers : subjectHeaders;
+  const infoCols = infoHeaders.length;
 
   const topAssignRow = document.createElement('tr');
   for (let i = 0; i < infoCols + 1; i++) topAssignRow.appendChild(th(''));
@@ -55,40 +112,29 @@
   maxminHead.appendChild(topAssignRow);
 
   const headRow = document.createElement('tr');
-  if (ctx.isGrade3S1) {
-    ['병원', '부서', '내과/외과'].forEach((label) => headRow.appendChild(th(label)));
-  } else if (ctx.usesSubjectMode) {
-    ['과목', '병원', '부서'].forEach((label) => headRow.appendChild(th(label)));
-  } else {
-    ['과목', '병원'].forEach((label) => headRow.appendChild(th(label)));
-  }
+  infoHeaders.forEach((label) => headRow.appendChild(th(label)));
   headRow.appendChild(th('총계'));
   for (let i = 1; i <= numPeriods; i++) headRow.appendChild(th(`기간 ${i}`));
   maxminHead.appendChild(headRow);
 
   const periodTotalsMax = Array(numPeriods).fill(0);
 
-  maxData.forEach((maxRow) => {
+  orderedRows.forEach(({ maxRow, group }) => {
     const tr = document.createElement('tr');
 
     if (ctx.isGrade3S1) {
-      tr.appendChild(td(maxRow.hospital || ''));
+      if (group && showSubject31) tr.appendChild(subjectCell(group));
+      if (group) tr.appendChild(hospitalCell(group));
       tr.appendChild(td(maxRow.department || ''));
       tr.appendChild(td(deptTypeLabel(maxRow.deptType)));
-    } else if (ctx.usesSubjectMode) {
-      tr.appendChild(td(maxRow.subject || ''));
-      tr.appendChild(td(maxRow.hospital || ''));
-      tr.appendChild(td(maxRow.department || ''));
     } else {
       tr.appendChild(td(maxRow.subject || ''));
+      if (showBranch) tr.appendChild(td(maxRow.branch || ''));
       tr.appendChild(td(maxRow.hospital || ''));
+      tr.appendChild(td(maxRow.department || ''));
     }
 
-    let rowTotalMax = 0;
-    for (let p = 0; p < numPeriods; p++) {
-      rowTotalMax += maxRow.values?.[p] || 0;
-    }
-    tr.appendChild(td(String(rowTotalMax)));
+    tr.appendChild(td(String(rowTotal(maxRow))));
 
     for (let p = 0; p < numPeriods; p++) {
       const maxVal = maxRow.values?.[p];
@@ -114,14 +160,7 @@
 
   if (exportBtn) {
     exportBtn.addEventListener('click', () => {
-      downloadJSON('web_config.json', {
-        numA: Number(numA || 0),
-        numB: Number(numB || 0),
-        numPeriods: Number(numPeriods || 0),
-        assignments,
-        oneA: { max: maxData },
-        selectedSemester: ctx.info || null
-      });
+      downloadJSON('web_config.json', buildWebConfig());
     });
   }
 

@@ -1,250 +1,247 @@
 (function () {
+  if (BatchCommon.redirectIfNoSemester()) return;
+
   const {
     CLASS_OPTIONS,
     readConfig,
     writeConfig,
     getSelectedSemester,
     getContext,
-    normalizeAssignmentSemester,
-    assignmentSemesterToTermValue,
     GRADE31_ASSIGNMENT_SEMESTER,
     clearInputErrors,
-    markInvalid
+    markInvalid,
+    createEl
   } = BatchCommon;
 
-  const ctx = getContext();
-  const periodTermOptions = ctx.periodTermOptions || [];
-  const selectedSemester = getSelectedSemester();
+  /** 기간별 반 버튼 글자 (긴 '두 반 모두 가능'은 버튼에서 줄여 쓴다) */
+  const CLASS_BUTTON_LABELS = { A: 'A반', B: 'B반', 'A&B': '두 반 모두' };
+  const MAX_PERIODS_PER_GROUP = 30;
 
-  const semesterInfoEl = document.getElementById('selected-semester-info');
-  if (semesterInfoEl && selectedSemester) {
-    semesterInfoEl.textContent = `선택된 학기: ${selectedSemester.label}`;
-  }
+  const ctx = getContext();
+  const selectedSemester = getSelectedSemester();
+  // 기간 묶음: 3-2·4-1·4-2는 방학 → 학기 순서로 번호를 붙이고, 3학년 1학기는 1학기 하나
+  const groups = ctx.usePeriodTermSelect
+    ? ctx.periodTermOptions.map(({ value, label }) => ({ semester: value, label }))
+    : [{ semester: GRADE31_ASSIGNMENT_SEMESTER, label: '1학기' }];
 
   const numAEl = document.getElementById('num-a');
   const numBEl = document.getElementById('num-b');
-  const numPeriodsEl = document.getElementById('num-periods');
-  const buildBtn = document.getElementById('build-periods');
+  const countsEl = document.getElementById('period-counts');
+  const countHintEl = document.getElementById('period-count-hint');
   const periodContainer = document.getElementById('period-assignments');
+  const errorEl = document.getElementById('config-error');
   const go1a = document.getElementById('go-1a');
-  const periodHintEl = document.getElementById('period-assignments-hint');
 
-  if (periodHintEl) {
-    if (ctx.isGrade4S1) {
-      periodHintEl.textContent =
-        '"기간별 입력 생성" 후 각 기간의 반·동계방학/1학기를 선택해주세요.';
-    } else if (ctx.isGrade3S2 || ctx.isGrade4S2) {
-      periodHintEl.textContent =
-        '"기간별 입력 생성" 후 각 기간의 반·하계방학/2학기를 선택해주세요.';
-    } else {
-      periodHintEl.textContent =
-        '"기간별 입력 생성" 버튼을 눌러 기간별 반/학기 선택을 만들어주세요.';
-    }
+  /** counts[묶음] = 기간 수, classes[묶음][묶음 안 순서] = 반 */
+  const state = { counts: groups.map(() => 0), classes: groups.map(() => []) };
+
+  document.getElementById('selected-semester-info').textContent = `선택된 학기: ${selectedSemester.label}`;
+  countHintEl.textContent = groups.length > 1
+    ? `${groups.map((g) => g.label).join('과 ')} 기간 수를 각각 넣으세요. 기간 번호는 ${groups[0].label}부터 차례로 붙습니다.`
+    : `${groups[0].label} 기간 수를 넣으세요.`;
+
+  function clampCount(raw) {
+    const num = Math.floor(Number(raw));
+    return Number.isFinite(num) && num > 0 ? Math.min(num, MAX_PERIODS_PER_GROUP) : 0;
   }
 
-  function createClassSelect(id) {
-    const select = document.createElement('select');
-    select.className = 'select';
-    if (id) select.id = id;
-
-    const placeholder = document.createElement('option');
-    placeholder.value = '';
-    placeholder.textContent = '반 선택';
-    placeholder.disabled = true;
-    placeholder.selected = true;
-    select.appendChild(placeholder);
-
-    CLASS_OPTIONS.forEach(({ value, label }) => {
-      const opt = document.createElement('option');
-      opt.value = value;
-      opt.textContent = label;
-      select.appendChild(opt);
-    });
-
-    return select;
-  }
-
-  function setSelectValue(select, value) {
-    if (!select || !value) return;
-    select.value = value;
-    if (select.value !== value) return;
-    const first = select.querySelector('option[disabled]');
-    if (first) first.selected = false;
-  }
-
-  function createSemesterSelect(id) {
-    const select = document.createElement('select');
-    select.className = 'select';
-    if (id) select.id = id;
-
-    const placeholder = document.createElement('option');
-    placeholder.value = '';
-    placeholder.textContent = '학기 선택';
-    placeholder.disabled = true;
-    placeholder.selected = true;
-    select.appendChild(placeholder);
-
-    ['1', '2'].forEach((value) => {
-      const opt = document.createElement('option');
-      opt.value = value;
-      opt.textContent = `${value}학기`;
-      select.appendChild(opt);
-    });
-
-    return select;
-  }
-
-  function createPeriodTermSelect(id, savedValue) {
-    const select = document.createElement('select');
-    select.className = 'select period-term-select';
-    if (id) select.id = id;
-
-    const placeholder = document.createElement('option');
-    placeholder.value = '';
-    placeholder.textContent = '기간 구분';
-    placeholder.disabled = true;
-    placeholder.selected = !savedValue;
-    select.appendChild(placeholder);
-
-    periodTermOptions.forEach(({ value, label }) => {
-      const opt = document.createElement('option');
-      opt.value = value;
-      opt.textContent = label;
-      if (savedValue === value) {
-        opt.selected = true;
-        placeholder.selected = false;
-      }
-      select.appendChild(opt);
-    });
-
-    return select;
-  }
-
-  function getSavedAssignments() {
+  /** 저장해 둔 설정에서 학생 수, 묶음별 기간 수, 기간별 반을 되살린다 */
+  function restoreState() {
     const saved = readConfig();
-    const list = Array.isArray(saved.assignments) ? saved.assignments : [];
-    const byPeriod = new Map();
-    list.forEach((a) => {
-      if (a && a.period != null) byPeriod.set(Number(a.period), a);
+    numAEl.value = saved.numA ?? '';
+    numBEl.value = saved.numB ?? '';
+    const assignments = sortedAssignments(saved.assignments);
+    groups.forEach((group, gi) => {
+      const inGroup = groups.length > 1
+        ? assignments.filter((a) => String(a.semester) === group.semester)
+        : assignments;
+      state.counts[gi] = Math.min(inGroup.length, MAX_PERIODS_PER_GROUP);
+      state.classes[gi] = inGroup.map((a) => a.class || null);
     });
-    return byPeriod;
   }
 
-  function rebuildPeriodRows() {
-    const numPeriods = Math.max(0, Number(numPeriodsEl.value) || 0);
-    periodContainer.innerHTML = '';
+  /** 묶음 순서대로 번호를 붙인 기간 목록: [{ period, semester, groupIndex, indexInGroup }] */
+  function periodList() {
+    const list = [];
+    groups.forEach((group, groupIndex) => {
+      for (let indexInGroup = 0; indexInGroup < state.counts[groupIndex]; indexInGroup++) {
+        list.push({ period: list.length + 1, semester: group.semester, groupIndex, indexInGroup });
+      }
+    });
+    return list;
+  }
 
-    if (numPeriods === 0) {
-      const p = document.createElement('p');
-      p.className = 'muted';
-      p.textContent = '기간 수를 1 이상으로 입력하고 생성 버튼을 눌러주세요.';
-      periodContainer.appendChild(p);
+  function renderCountInputs() {
+    countsEl.innerHTML = '';
+    groups.forEach((group, gi) => {
+      const field = createEl('div', 'field');
+      const label = createEl('label', 'field-label', `${group.label} 기간 수`);
+      label.htmlFor = `count-${gi}`;
+      const input = document.createElement('input');
+      Object.assign(input, { id: `count-${gi}`, type: 'number', min: '0', max: String(MAX_PERIODS_PER_GROUP), placeholder: '예: 4' });
+      input.className = 'period-count-input';
+      input.value = state.counts[gi] ? String(state.counts[gi]) : '';
+      input.addEventListener('input', () => {
+        state.counts[gi] = clampCount(input.value);
+        renderPeriods();
+      });
+      field.append(label, input);
+      countsEl.appendChild(field);
+    });
+  }
+
+  function setPressed(toggle, value) {
+    toggle.querySelectorAll('button').forEach((button, i) => {
+      button.setAttribute('aria-pressed', String(CLASS_OPTIONS[i].value === value));
+    });
+  }
+
+  /** 반 고르기 버튼 묶음 [A반][B반][두 반 모두] */
+  function createClassToggle(groupIndex, indexInGroup) {
+    const toggle = createEl('div', 'class-toggle');
+    toggle.setAttribute('role', 'group');
+    CLASS_OPTIONS.forEach(({ value }) => {
+      const button = createEl('button', null, CLASS_BUTTON_LABELS[value]);
+      button.type = 'button';
+      button.addEventListener('click', () => {
+        state.classes[groupIndex][indexInGroup] = value;
+        setPressed(toggle, value);
+        toggle.classList.remove('input-error');
+      });
+      toggle.appendChild(button);
+    });
+    setPressed(toggle, state.classes[groupIndex][indexInGroup]);
+    return toggle;
+  }
+
+  /** 묶음(방학·학기) 전체를 같은 반으로 정하는 버튼 */
+  function createQuickFill(groupIndex) {
+    const wrap = createEl('div', 'quick-fill');
+    wrap.appendChild(createEl('span', null, '한 번에'));
+    CLASS_OPTIONS.forEach(({ value }) => {
+      const button = createEl('button', null, CLASS_BUTTON_LABELS[value]);
+      button.type = 'button';
+      button.addEventListener('click', () => {
+        state.classes[groupIndex] = Array.from({ length: state.counts[groupIndex] }, () => value);
+        renderPeriods();
+      });
+      wrap.appendChild(button);
+    });
+    return wrap;
+  }
+
+  function createGroupBlock(group, periods) {
+    const block = createEl('div', 'period-group');
+    const header = createEl('div', 'period-group-header');
+    const first = periods[0].period;
+    const last = periods[periods.length - 1].period;
+    const range = first === last ? `기간 ${first}` : `기간 ${first}~${last}`;
+    header.append(createEl('span', 'period-group-title', `${group.label} · ${range}`), createQuickFill(periods[0].groupIndex));
+    block.appendChild(header);
+    periods.forEach(({ period, groupIndex, indexInGroup }) => {
+      const row = createEl('div', 'period-row');
+      row.append(createEl('span', 'period-label', `기간 ${period}`), createClassToggle(groupIndex, indexInGroup));
+      block.appendChild(row);
+    });
+    return block;
+  }
+
+  function renderPeriods() {
+    periodContainer.innerHTML = '';
+    const list = periodList();
+    if (!list.length) {
+      periodContainer.appendChild(createEl('p', 'muted', '기간 수를 넣으면 기간마다 반을 고를 수 있습니다.'));
       return;
     }
-
-    const savedByPeriod = getSavedAssignments();
-
-    for (let i = 1; i <= numPeriods; i++) {
-      const saved = savedByPeriod.get(i) || {};
-      const row = document.createElement('div');
-      row.className = 'period-row';
-
-      const label = document.createElement('span');
-      label.className = 'period-label';
-      label.textContent = `기간 ${i}`;
-
-      const classSelect = createClassSelect(`period-${i}-class`);
-      setSelectValue(classSelect, saved.class);
-
-      row.appendChild(label);
-      row.appendChild(classSelect);
-
-      if (ctx.usePeriodTermSelect) {
-        const termUi = assignmentSemesterToTermValue(saved.semester || '', ctx);
-        row.appendChild(createPeriodTermSelect(`period-${i}-semester`, termUi));
-      } else if (!ctx.autoPeriodSemester) {
-        const semSelect = createSemesterSelect(`period-${i}-semester`);
-        setSelectValue(semSelect, saved.semester);
-        row.appendChild(semSelect);
-      } else {
-        const hiddenSem = document.createElement('input');
-        hiddenSem.type = 'hidden';
-        hiddenSem.id = `period-${i}-semester`;
-        hiddenSem.value = GRADE31_ASSIGNMENT_SEMESTER;
-        row.appendChild(hiddenSem);
-      }
-
-      periodContainer.appendChild(row);
-    }
+    groups.forEach((group, gi) => {
+      const periods = list.filter((p) => p.groupIndex === gi);
+      if (periods.length) periodContainer.appendChild(createGroupBlock(group, periods));
+    });
   }
 
   function buildConfig() {
-    const numPeriods = Number(numPeriodsEl.value);
-    const assignments = [];
-
-    for (let i = 1; i <= numPeriods; i++) {
-      const clsSel = document.getElementById(`period-${i}-class`);
-      const semSel = document.getElementById(`period-${i}-semester`);
-      const selectedClass = clsSel ? clsSel.value : '';
-      let rawSemester = semSel ? semSel.value : '';
-      const selectedSemesterValue = normalizeAssignmentSemester(rawSemester, ctx);
-
-      assignments.push({
-        period: i,
-        class: selectedClass || null,
-        semester: selectedSemesterValue || null
-      });
-    }
-
+    const assignments = periodList().map(({ period, semester, groupIndex, indexInGroup }) => ({
+      period,
+      class: state.classes[groupIndex][indexInGroup] || null,
+      semester
+    }));
     return {
       numA: Number(numAEl.value),
       numB: Number(numBEl.value),
-      numPeriods,
+      numPeriods: assignments.length,
       assignments,
       selectedSemester: selectedSemester || null
     };
   }
 
-  function validateAndMark() {
-    clearInputErrors(document);
-    let ok = true;
-
-    if (!numAEl.value.trim()) { markInvalid(numAEl); ok = false; }
-    if (!numBEl.value.trim()) { markInvalid(numBEl); ok = false; }
-    if (!numPeriodsEl.value.trim() || Number(numPeriodsEl.value) < 1) {
-      markInvalid(numPeriodsEl);
-      ok = false;
-    }
-
-    const numPeriods = Number(numPeriodsEl.value || '0');
-    for (let i = 1; i <= numPeriods; i++) {
-      const clsSel = document.getElementById(`period-${i}-class`);
-      const semSel = document.getElementById(`period-${i}-semester`);
-      if (!clsSel?.value) { markInvalid(clsSel); ok = false; }
-      const needsSemester = ctx.usePeriodTermSelect || !ctx.autoPeriodSemester;
-      if (needsSemester && !semSel?.value) { markInvalid(semSel); ok = false; }
-    }
-
-    return ok;
+  function sortedAssignments(assignments) {
+    return (Array.isArray(assignments) ? assignments : []).slice().sort((a, b) => Number(a.period) - Number(b.period));
   }
 
-  buildBtn.addEventListener('click', rebuildPeriodRows);
-
-  const existing = readConfig();
-  if (existing.numPeriods) {
-    numAEl.value = existing.numA ?? '';
-    numBEl.value = existing.numB ?? '';
-    numPeriodsEl.value = existing.numPeriods ?? '';
-    if (Number(existing.numPeriods) > 0) rebuildPeriodRows();
-  }
-
-  if (go1a) {
-    go1a.addEventListener('click', (e) => {
-      if (!validateAndMark()) {
-        e.preventDefault();
-        return;
-      }
-      writeConfig(buildConfig());
+  /** 기간마다 "방학·학기 구분#그 안의 순서" 이름을 붙인다 (예: 방학 첫 기간 '1#1', 학기 둘째 기간 '2#2') */
+  function periodKeys(assignments) {
+    const seen = {};
+    return sortedAssignments(assignments).map((a) => {
+      const semester = String(a.semester);
+      seen[semester] = (seen[semester] || 0) + 1;
+      return `${semester}#${seen[semester]}`;
     });
   }
+
+  /**
+   * 이전·다음 화면을 오가도 이미 넣은 최대 인원 표를 남긴다.
+   * 기간 수가 바뀌었으면 값을 같은 방학·학기 순서의 새 기간으로 옮기고, 새 기간은 0으로 둔다.
+   */
+  function withCarriedTable(saved, next) {
+    const rows = saved?.oneA?.max;
+    if (!Array.isArray(rows) || !rows.length) return next;
+    const oldIndexByKey = new Map(periodKeys(saved.assignments).map((key, i) => [key, i]));
+    const newKeys = periodKeys(next.assignments);
+    const max = rows.map((row) => ({
+      ...row,
+      values: newKeys.map((key) => (oldIndexByKey.has(key) ? Number(row.values?.[oldIndexByKey.get(key)] || 0) : 0))
+    }));
+    return { ...next, oneA: { ...saved.oneA, max } };
+  }
+
+  /** 빠진 값을 표시하고 고칠 내용을 문장 목록으로 돌려준다 */
+  function findProblems() {
+    const problems = [];
+    const missingCounts = [numAEl, numBEl].filter((el) => !el.value.trim() || Number(el.value) < 0);
+    missingCounts.forEach(markInvalid);
+    if (missingCounts.length) problems.push('A반·B반 학생 수를 넣어 주세요.');
+    const list = periodList();
+    if (!list.length) {
+      countsEl.querySelectorAll('input').forEach(markInvalid);
+      problems.push('기간 수를 1 이상 넣어 주세요.');
+    }
+    const toggles = periodContainer.querySelectorAll('.class-toggle');
+    const unchosen = list.filter((p, i) => {
+      if (state.classes[p.groupIndex][p.indexInGroup]) return false;
+      markInvalid(toggles[i]);
+      return true;
+    });
+    if (unchosen.length) problems.push(`반을 고르지 않은 기간이 있습니다: ${unchosen.map((p) => `기간 ${p.period}`).join(', ')}`);
+    return problems;
+  }
+
+  function validateAndShow() {
+    clearInputErrors(document);
+    const problems = findProblems();
+    errorEl.textContent = problems.join(' ');
+    errorEl.classList.toggle('hidden', !problems.length);
+    return !problems.length;
+  }
+
+  restoreState();
+  renderCountInputs();
+  renderPeriods();
+
+  go1a.addEventListener('click', (e) => {
+    if (!validateAndShow()) {
+      e.preventDefault();
+      return;
+    }
+    writeConfig(withCarriedTable(readConfig(), buildConfig()));
+  });
 })();

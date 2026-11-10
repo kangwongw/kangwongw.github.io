@@ -6,7 +6,7 @@
         JSON.stringify({ grade, semester, label: `${grade}학년 ${semester}학기` })
       );
       localStorage.removeItem(BatchCommon.KEYS.config);
-      localStorage.removeItem(BatchCommon.KEYS.oneASemester);
+      localStorage.removeItem(BatchCommon.KEYS.inputMethod);
     } catch (e) {
       console.error('localStorage 저장 실패:', e);
     }

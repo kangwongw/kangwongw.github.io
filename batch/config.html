@@ -25,45 +25,50 @@
           <span class="sep">&gt;</span>
           <span>배치 입력</span>
         </nav>
-        <h1 class="page-main-title">배치 파라미터 입력</h1>
-        <p class="page-description">학생 수와 기간별 반·학기 정보를 입력합니다.</p>
+        <h1 class="page-main-title">학생 수와 실습 기간 입력</h1>
+        <p class="page-description">반별 학생 수와 실습 기간 수를 넣고, 기간마다 실습하는 반을 고릅니다.</p>
       </div>
     </section>
 
     <main class="content-grid">
       <section class="panel">
         <div class="panel-toolbar">
-          <h2>입력 폼</h2>
+          <h2>기본 정보</h2>
           <span id="selected-semester-info" class="semester-badge"></span>
         </div>
 
-        <form id="config-form" class="form-grid">
-          <div class="field">
-            <label class="field-label" for="num-a">A반 학생 수</label>
-            <input id="num-a" name="numA" type="number" min="0" placeholder="예: 40" required />
-          </div>
-
-          <div class="field">
-            <label class="field-label" for="num-b">B반 학생 수</label>
-            <input id="num-b" name="numB" type="number" min="0" placeholder="예: 40" required />
-          </div>
-
-          <div class="field">
-            <label class="field-label" for="num-periods">기간 수</label>
-            <input id="num-periods" name="numPeriods" type="number" min="1" placeholder="예: 7" required />
-          </div>
-
-          <div class="field inline">
-            <button type="button" id="build-periods" class="btn">기간별 입력 생성</button>
-          </div>
-
-          <section id="period-assignments" class="panel-inner full-width field">
-            <p id="period-assignments-hint" class="muted">"기간별 입력 생성" 버튼을 눌러 기간별 반/학기 선택을 만들어주세요.</p>
+        <form id="config-form" autocomplete="off">
+          <section class="config-step">
+            <h3 class="config-step-title">1. 학생 수</h3>
+            <div class="form-grid">
+              <div class="field">
+                <label class="field-label" for="num-a">A반 학생 수</label>
+                <input id="num-a" name="numA" type="number" min="0" placeholder="예: 40" required />
+              </div>
+              <div class="field">
+                <label class="field-label" for="num-b">B반 학생 수</label>
+                <input id="num-b" name="numB" type="number" min="0" placeholder="예: 40" required />
+              </div>
+            </div>
           </section>
+
+          <section class="config-step">
+            <h3 class="config-step-title">2. 기간 수</h3>
+            <p id="period-count-hint" class="muted"></p>
+            <div id="period-counts" class="form-grid"></div>
+          </section>
+
+          <section class="config-step">
+            <h3 class="config-step-title">3. 기간별 반</h3>
+            <p class="muted">기간마다 실습하는 반을 누르세요. 묶음 오른쪽의 '한 번에' 버튼으로 같은 반을 한꺼번에 정할 수도 있습니다.</p>
+            <div id="period-assignments" class="panel-inner"></div>
+          </section>
+
+          <p id="config-error" class="input-error-text hidden" role="alert"></p>
 
           <div class="actions">
             <a href="index.html" class="btn">이전</a>
-            <a href="page-1a.html" id="go-1a" class="btn primary">다음 (1-A 설정)</a>
+            <a href="page-1a-method.html" id="go-1a" class="btn primary">다음 (입력 방식 선택)</a>
           </div>
         </form>
       </section>

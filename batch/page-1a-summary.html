@@ -25,7 +25,9 @@
           <span class="sep">&gt;</span>
           <a href="config.html">배치 입력</a>
           <span class="sep">&gt;</span>
-          <a href="page-1a.html">1-A 최대 인원</a>
+          <a href="page-1a-method.html">입력 방식</a>
+          <span class="sep">&gt;</span>
+          <a href="page-1a.html" id="input-method-crumb">1-A 최대 인원</a>
           <span class="sep">&gt;</span>
           <span>요약</span>
         </nav>
@@ -55,9 +57,10 @@
       </section>
 
       <div class="actions panel-actions">
-        <a href="page-1a.html" class="btn">이전</a>
+        <a href="page-1a.html" id="summary-prev" class="btn">이전</a>
         <button type="button" id="export-config" class="btn primary">web_config.json 저장</button>
         <button type="button" id="export-image" class="btn primary">최대 인원 표 이미지 저장</button>
+        <a href="json-edit.html?from=summary" id="edit-table" class="btn primary">최대 인원 표 수정</a>
       </div>
     </main>
 
@@ -68,7 +71,6 @@
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script src="js/batch-common.js"></script>
-  <script src="js/page-1a-shared.js"></script>
   <script src="js/page-1a-summary.js"></script>
 </body>
 </html>

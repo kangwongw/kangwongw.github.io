@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>입력 방식 선택</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="page-shell">
+    <header class="site-header">
+      <a href="index.html" class="logo-link">
+        <div class="logo">
+          <img src="https://www.kangwon.ac.kr/assets/ko/images/logos/logo-color.webp" alt="강원대학교" />
+          <span class="label-status campus" style="color:white;background:#F1B337" aria-label="원주">원주</span>
+          <strong>간호학과 실습 배치</strong>
+        </div>
+      </a>
+    </header>
+
+    <section class="hero">
+      <div class="hero-content">
+        <nav class="breadcrumbs" aria-label="경로">
+          <a href="index.html">학기 선택</a>
+          <span class="sep">&gt;</span>
+          <a href="config.html">배치 입력</a>
+          <span class="sep">&gt;</span>
+          <span>입력 방식</span>
+        </nav>
+        <h1 class="page-main-title">입력 방식 선택</h1>
+        <p class="page-description">기간별 최대 인원을 입력할 방법을 선택하세요.</p>
+      </div>
+    </section>
+
+    <main class="content-grid">
+      <section class="panel">
+        <div class="semester-selection">
+          <div class="semester-grid">
+            <article class="semester-card" data-href="page-1a-excel.html" tabindex="0" role="button">
+              <h3>엑셀 템플릿</h3>
+              <p>템플릿을 내려받아 작성한 뒤 업로드</p>
+            </article>
+            <article class="semester-card" data-href="page-1a.html" tabindex="0" role="button">
+              <h3>직접 입력</h3>
+              <p>웹 화면에서 행을 추가하며 입력</p>
+            </article>
+          </div>
+          <div class="semester-actions">
+            <a href="config.html" class="btn">이전</a>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <p>문의: codesensory@gmail.com</p>
+    </footer>
+  </div>
+
+  <script src="js/batch-common.js"></script>
+  <script src="js/page-1a-method.js"></script>
+</body>
+</html>

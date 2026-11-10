@@ -2,8 +2,23 @@ const BatchCommon = (function () {
   const KEYS = {
     semester: 'selectedSemester',
     config: 'batchConfig',
-    oneASemester: 'selectedSemesterOneA'
+    inputMethod: 'inputMethod'
   };
+
+  const INPUT_METHOD = { EXCEL: 'excel', MANUAL: 'manual' };
+
+  /** 최대 인원 입력 방식별 화면 (요약 화면의 '이전' 경로에 쓴다) */
+  const INPUT_METHODS = {
+    [INPUT_METHOD.EXCEL]: { page: 'page-1a-excel.html', label: '엑셀 업로드' },
+    [INPUT_METHOD.MANUAL]: { page: 'page-1a.html', label: '1-A 최대 인원' }
+  };
+
+  /** 3학년 1학기 부서 유형 */
+  const DEPT_TYPE_OPTIONS = [
+    { value: 'internal', label: '내과' },
+    { value: 'external', label: '외과' },
+    { value: 'both', label: '내과&외과' }
+  ];
 
   const CLASS_OPTIONS = [
     { value: 'A', label: 'A반' },
@@ -23,34 +38,18 @@ const BatchCommon = (function () {
     { value: '2', label: '2학기' }
   ];
 
-  /** 3학년 1학기: 반만 선택, semester는 항상 "2" */
-  const GRADE31_ASSIGNMENT_SEMESTER = '2';
+  /** 3학년 1학기: 반만 선택, 모든 기간이 1학기라 semester는 항상 "1" */
+  const GRADE31_ASSIGNMENT_SEMESTER = '1';
 
-  /** UI·레거시 값 → JSON assignments[].semester ("1" | "2") */
-  function normalizeAssignmentSemester(value, ctx) {
-    const v = String(value || '').trim();
-    if (ctx.isGrade3S1) return GRADE31_ASSIGNMENT_SEMESTER;
-    if (ctx.isGrade4S1) {
-      if (v === 'winter') return '1';
-      if (v === '2') return '2';
-      if (v === '1') return '1';
-      return v;
-    }
-    if (ctx.isGrade3S2 || ctx.isGrade4S2) {
-      if (v === 'summer') return '1';
-      if (v === '1' || v === '2') return v;
-      return v;
-    }
-    return v;
-  }
+  /** 과목 안의 분야 목록 ("학년-학기"별): 엑셀 드롭다운과 직접 입력 안내 예시에 같이 쓴다 */
+  const BRANCH_OPTIONS = {
+    '3-2': ['산부인과/분만실', '소아과/신생아실'],
+    '4-1': ['아동', '모성'],
+    '4-2': ['정신', '지역']
+  };
 
-  /** JSON semester → 기간 구분 드롭다운 value */
-  function assignmentSemesterToTermValue(stored, ctx) {
-    const v = String(stored || '').trim();
-    if (!ctx.usePeriodTermSelect) return v;
-    if (ctx.isGrade4S1 && v === 'winter') return '1';
-    if ((ctx.isGrade3S2 || ctx.isGrade4S2) && v === 'summer') return '1';
-    return v;
+  function branchOptionsFor(info) {
+    return BRANCH_OPTIONS[`${info?.grade}-${info?.semester}`] || [];
   }
 
   function getPeriodTermOptions(ctx) {
@@ -82,14 +81,11 @@ const BatchCommon = (function () {
     }
   }
 
-  function getOneASemester() {
-    return localStorage.getItem(KEYS.oneASemester) || '1';
-  }
-
-  function setOneASemester(value) {
-    try {
-      localStorage.setItem(KEYS.oneASemester, value);
-    } catch (_) {}
+  /** 학기를 고르지 않고 들어온 경우 학기 선택 화면으로 돌려보낸다 */
+  function redirectIfNoSemester() {
+    if (getSelectedSemester()) return false;
+    window.location.replace('index.html');
+    return true;
   }
 
   function getContext() {
@@ -98,9 +94,7 @@ const BatchCommon = (function () {
     const isGrade3S2 = !!(info && info.grade === 3 && info.semester === 2);
     const isGrade4S1 = !!(info && info.grade === 4 && info.semester === 1);
     const isGrade4S2 = !!(info && info.grade === 4 && info.semester === 2);
-    const autoPeriodSemester = isGrade3S1;
     const usePeriodTermSelect = isGrade4S1 || isGrade3S2 || isGrade4S2;
-    const hideSemesterUI = autoPeriodSemester || usePeriodTermSelect;
     const periodTermOptions = getPeriodTermOptions({
       isGrade4S1,
       isGrade3S2,
@@ -114,9 +108,7 @@ const BatchCommon = (function () {
       isGrade3S2,
       isGrade4S1,
       isGrade4S2,
-      autoPeriodSemester,
       usePeriodTermSelect,
-      hideSemesterUI,
       usesSubjectMode,
       periodTermOptions
     };
@@ -126,70 +118,65 @@ const BatchCommon = (function () {
     const v = String(value || '').trim();
     if (!v) return '';
     if (ctx?.isGrade4S1) {
-      if (v === '1' || v === 'winter') return '동계방학';
+      if (v === '1') return '동계방학';
       if (v === '2') return '1학기';
     }
     if (ctx?.isGrade3S2 || ctx?.isGrade4S2) {
-      if (v === '1' || v === 'summer') return '하계방학';
+      if (v === '1') return '하계방학';
       if (v === '2') return '2학기';
     }
     if (v === '1') return '1학기';
     if (v === '2') return '2학기';
-    if (v === 'winter') return '동계방학';
-    if (v === 'summer') return '하계방학';
     return '';
   }
 
-  function periodSemester(assignments, index) {
-    const row = assignments[index];
-    return row && row.semester ? String(row.semester) : '';
+  function setInputMethod(method) {
+    try {
+      localStorage.setItem(KEYS.inputMethod, method);
+    } catch (_) {}
   }
 
-  function visiblePeriodIndexes(numPeriods, assignments, selectedSemester, hideSemesterUI) {
-    if (hideSemesterUI) {
-      return Array.from({ length: numPeriods }, (_, i) => i);
+  function getInputMethod() {
+    try {
+      return INPUT_METHODS[localStorage.getItem(KEYS.inputMethod)] || INPUT_METHODS[INPUT_METHOD.MANUAL];
+    } catch (_) {
+      return INPUT_METHODS[INPUT_METHOD.MANUAL];
     }
-    return Array.from({ length: numPeriods }, (_, i) => i).filter(
-      (i) => periodSemester(assignments, i) === selectedSemester
-    );
   }
 
-  function mergeSemesterRows(sem1Data, sem2Data) {
-    const allRows = new Map();
-    [sem1Data, sem2Data].forEach((rows) => {
-      rows.forEach((row) => {
-        const key = `${row.subject}|${row.hospital}|${row.department || ''}`;
-        if (!allRows.has(key)) {
-          allRows.set(key, { ...row, values: [...row.values] });
-          return;
-        }
-        const existing = allRows.get(key);
-        row.values.forEach((val, idx) => {
-          if (val > 0) existing.values[idx] = val;
-        });
-      });
+  function deptTypeLabel(value) {
+    return DEPT_TYPE_OPTIONS.find((opt) => opt.value === value)?.label || '';
+  }
+
+  /** 최대 인원 행들을 병원 이름별로 묶는다 (처음 나온 순서 유지) */
+  function groupByHospital(rows) {
+    const groups = new Map();
+    rows.forEach((row, index) => {
+      const hospital = row.hospital || '';
+      if (!groups.has(hospital)) groups.set(hospital, { hospital, indexes: [] });
+      groups.get(hospital).indexes.push(index);
     });
-    return Array.from(allRows.values());
+    return Array.from(groups.values());
   }
 
-  function persistOneASemesterData(store, field, data, ctx, selectedSemester) {
-    store.oneA = store.oneA || {};
-
-    // 3-1, 3-2, 4-1, 4-2: 기간을 한 화면에서 입력 → 행별(과목·병원·부서) 그대로 저장
-    if (ctx.hideSemesterUI) {
-      store.oneA[`${field}_sem1`] = data;
-      store.oneA[field] = data;
-      return;
-    }
-
-    store.oneA[`${field}_sem${selectedSemester}`] = data;
-    const sem1 = store.oneA[`${field}_sem1`] || [];
-    const sem2 = store.oneA[`${field}_sem2`] || [];
-    store.oneA[field] = mergeSemesterRows(sem1, sem2);
+  /** 지금 입력한 값으로 만든 web_config.json 내용 (요약 화면 저장·JSON 수정 화면이 같이 쓴다) */
+  function buildWebConfig() {
+    const store = readConfig();
+    return {
+      numA: Number(store.numA || 0),
+      numB: Number(store.numB || 0),
+      numPeriods: Number(store.numPeriods || 0),
+      assignments: Array.isArray(store.assignments) ? store.assignments : [],
+      oneA: { max: store?.oneA?.max || [] },
+      selectedSemester: getSelectedSemester() || null
+    };
   }
 
   function downloadJSON(filename, dataObj) {
-    const blob = new Blob([JSON.stringify(dataObj, null, 2)], { type: 'application/json' });
+    downloadBlob(filename, new Blob([JSON.stringify(dataObj, null, 2)], { type: 'application/json' }));
+  }
+
+  function downloadBlob(filename, blob) {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
@@ -217,25 +204,24 @@ const BatchCommon = (function () {
 
   return {
     KEYS,
+    INPUT_METHOD,
     CLASS_OPTIONS,
-    GRADE4S1_PERIOD_TERM_OPTIONS,
-    GRADE32_42_PERIOD_TERM_OPTIONS,
+    DEPT_TYPE_OPTIONS,
     GRADE31_ASSIGNMENT_SEMESTER,
-    getPeriodTermOptions,
-    normalizeAssignmentSemester,
-    assignmentSemesterToTermValue,
+    branchOptionsFor,
     formatAssignmentSemester,
     readConfig,
     writeConfig,
     getSelectedSemester,
-    getOneASemester,
-    setOneASemester,
+    redirectIfNoSemester,
     getContext,
-    periodSemester,
-    visiblePeriodIndexes,
-    mergeSemesterRows,
-    persistOneASemesterData,
+    setInputMethod,
+    getInputMethod,
+    deptTypeLabel,
+    groupByHospital,
+    buildWebConfig,
     downloadJSON,
+    downloadBlob,
     clearInputErrors,
     markInvalid,
     createEl
