@@ -6,7 +6,7 @@
   <title>학기 선택</title>
   <link rel="stylesheet" href="style.css" />
 </head>
-<body>
+<body class="home">
   <div class="page-shell">
     <header class="site-header">
       <a href="index.html" class="logo-link">
@@ -20,8 +20,17 @@
 
     <section class="hero">
       <div class="hero-content">
-        <h1 class="page-main-title">학기 선택</h1>
-        <p class="page-description">배치 설정을 시작할 학기를 선택하세요.</p>
+        <div class="hero-text">
+          <h1 class="page-main-title">학기 선택</h1>
+          <p class="page-description">배치 설정을 시작할 학기를 선택하세요.</p>
+        </div>
+        <a class="manual-btn" href="강원대학교%20간호학과(원주)%20실습배치%20프로그램%20사용법%20안내.pdf" target="_blank" rel="noopener">
+          <span class="manual-icon" aria-hidden="true">PDF</span>
+          <span class="manual-text">
+            <strong>사용법 안내</strong>
+            <small>매뉴얼 PDF 보기</small>
+          </span>
+        </a>
       </div>
     </section>
 
@@ -47,8 +56,14 @@
             </article>
           </div>
           <div class="semester-actions">
-            <a href="https://github.com/CodeSensory/CodeSensory.github.io/releases/latest/download/KNU_Wonju_Nursing_Placement.exe" download="KNU_Wonju_Nursing_Placement.exe" class="btn">배치 프로그램 다운로드</a>
-            <a href="json-edit.html" class="btn primary">JSON 수정</a>
+            <a href="https://github.com/CodeSensory/CodeSensory.github.io/releases/latest/download/KNU_Wonju_Nursing_Placement.exe" download="KNU_Wonju_Nursing_Placement.exe" class="btn">
+              <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11m0 0-4.5-4.5M12 15l4.5-4.5M5 19h14" /></svg>
+              배치 프로그램 다운로드
+            </a>
+            <a href="json-edit.html" class="btn primary">
+              <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16v4zM13.5 6.5l4 4" /></svg>
+              JSON 수정
+            </a>
           </div>
         </div>
       </section>

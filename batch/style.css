@@ -1026,3 +1026,341 @@ input[type="number"] {
     grid-template-columns: 1fr;
   }
 }
+
+/* ---------- 첫 화면(index.html) 꾸미기: body.home 에만 적용, 배치(구조)는 그대로 ---------- */
+@keyframes home-fade-up {
+  from { opacity: 0; transform: translateY(18px); }
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes home-float {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(28px, -20px) scale(1.08); }
+}
+
+@keyframes home-shine {
+  from { transform: translateX(-130%) skewX(-20deg); }
+  to { transform: translateX(260%) skewX(-20deg); }
+}
+
+@keyframes home-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(241, 179, 55, 0.45); }
+  50% { box-shadow: 0 0 0 8px rgba(241, 179, 55, 0); }
+}
+
+/* 위쪽 제목 띠: 연한 파랑 바탕 + 점 무늬 + 천천히 떠다니는 빛 */
+.home .hero {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  padding: 44px 32px 40px;
+  background:
+    radial-gradient(rgba(0, 61, 122, 0.07) 1px, transparent 1.5px) 0 0 / 18px 18px,
+    linear-gradient(135deg, #f8fbff 0%, var(--knu-blue-bg) 60%, #dde9f6 100%);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.home .hero::before,
+.home .hero::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.home .hero::before {
+  width: 380px;
+  height: 380px;
+  right: -80px;
+  top: -170px;
+  background: radial-gradient(circle, rgba(0, 86, 179, 0.2), transparent 70%);
+  animation: home-float 12s ease-in-out infinite;
+}
+
+.home .hero::after {
+  width: 300px;
+  height: 300px;
+  right: 26%;
+  bottom: -200px;
+  background: radial-gradient(circle, rgba(241, 179, 55, 0.25), transparent 70%);
+  animation: home-float 16s ease-in-out infinite reverse;
+}
+
+.home .hero-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 20px 32px;
+}
+
+.home .hero-text > * {
+  animation: home-fade-up 0.6s ease both;
+}
+
+.home .hero-text .page-description {
+  animation-delay: 0.1s;
+}
+
+.home .page-main-title {
+  font-size: clamp(30px, 3.4vw, 40px);
+}
+
+/* 사용법 안내(PDF) 버튼 */
+.home .manual-btn {
+  position: relative;
+  overflow: hidden;
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 22px 12px 12px;
+  border-radius: 14px;
+  border: 1px solid rgba(0, 61, 122, 0.16);
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--knu-blue);
+  text-decoration: none;
+  box-shadow: 0 8px 22px rgba(0, 61, 122, 0.12);
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+  animation: home-fade-up 0.6s 0.2s ease both;
+}
+
+.home .manual-btn::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 40%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.85), transparent);
+  transform: translateX(-130%) skewX(-20deg);
+  pointer-events: none;
+}
+
+.home .manual-btn:hover,
+.home .manual-btn:focus-visible {
+  transform: translateY(-3px);
+  border-color: var(--knu-blue);
+  box-shadow: 0 14px 30px rgba(0, 61, 122, 0.2);
+  outline: none;
+}
+
+.home .manual-btn:hover::after,
+.home .manual-btn:focus-visible::after {
+  animation: home-shine 0.8s ease;
+}
+
+.home .manual-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  background: #F1B337;
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  animation: home-pulse 2.6s ease-in-out 1s infinite;
+}
+
+.home .manual-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.35;
+}
+
+.home .manual-text strong {
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.home .manual-text small {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.home .manual-text small::after {
+  content: " ↗";
+  display: inline-block;
+  transition: transform 0.25s ease;
+}
+
+.home .manual-btn:hover .manual-text small::after {
+  transform: translate(2px, -2px);
+}
+
+/* 학기 카드: 차례로 나타나기, 마우스를 따라오는 빛, 떠오르기 */
+.home .panel {
+  background: linear-gradient(180deg, #ffffff 0%, #fbfcfe 100%);
+}
+
+.home .semester-grid {
+  max-width: 680px;
+  gap: 22px;
+}
+
+.home .semester-card {
+  --mx: 50%;
+  --my: 50%;
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  padding: 34px 24px 30px;
+  box-shadow: 0 4px 14px rgba(0, 61, 122, 0.07);
+  transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.3s ease, border-color 0.3s ease;
+  animation: home-fade-up 0.55s ease both;
+}
+
+.home .semester-card:nth-child(1) { animation-delay: 0.15s; }
+.home .semester-card:nth-child(2) { animation-delay: 0.25s; }
+.home .semester-card:nth-child(3) { animation-delay: 0.35s; }
+.home .semester-card:nth-child(4) { animation-delay: 0.45s; }
+
+.home .semester-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: radial-gradient(240px circle at var(--mx) var(--my), rgba(0, 86, 179, 0.13), transparent 65%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+/* 카드 뒤에 옅게 깔리는 학기 번호 (예: 3-1) */
+.home .semester-card::after {
+  content: attr(data-grade) "-" attr(data-semester);
+  position: absolute;
+  right: 16px;
+  bottom: -18px;
+  z-index: -1;
+  font-size: 68px;
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  color: rgba(0, 61, 122, 0.06);
+  transition: transform 0.4s ease, color 0.3s ease;
+}
+
+.home .semester-card:hover,
+.home .semester-card:focus-visible {
+  transform: translateY(-6px);
+  border-color: rgba(0, 61, 122, 0.45);
+  box-shadow: 0 18px 36px rgba(0, 61, 122, 0.16);
+  outline: none;
+}
+
+.home .semester-card:hover::before,
+.home .semester-card:focus-visible::before {
+  opacity: 1;
+}
+
+.home .semester-card:hover::after,
+.home .semester-card:focus-visible::after {
+  transform: translateY(-8px) scale(1.06);
+  color: rgba(0, 61, 122, 0.11);
+}
+
+.home .semester-card:active {
+  transform: translateY(-2px) scale(0.99);
+}
+
+.home .semester-card h3 {
+  position: relative;
+  display: inline-block;
+  padding-bottom: 8px;
+}
+
+.home .semester-card h3::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  width: 40px;
+  height: 3px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, var(--knu-blue), #F1B337);
+  transform: translateX(-50%) scaleX(0.35);
+  transition: transform 0.3s ease;
+}
+
+.home .semester-card:hover h3::after,
+.home .semester-card:focus-visible h3::after {
+  transform: translateX(-50%) scaleX(1);
+}
+
+.home .semester-card p::after {
+  content: "→";
+  display: inline-block;
+  margin-left: 6px;
+  opacity: 0;
+  transform: translateX(-6px);
+  transition: opacity 0.25s ease, transform 0.25s ease;
+  color: var(--knu-blue);
+}
+
+.home .semester-card:hover p::after,
+.home .semester-card:focus-visible p::after {
+  opacity: 1;
+  transform: none;
+}
+
+/* 아래 버튼 두 개 */
+.home .semester-actions {
+  margin-top: 32px;
+  gap: 12px;
+  animation: home-fade-up 0.55s 0.55s ease both;
+}
+
+.home .semester-actions .btn {
+  gap: 8px;
+  padding: 12px 22px;
+  border-radius: 10px;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease, border-color 0.25s ease, color 0.25s ease;
+}
+
+.home .semester-actions .btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 22px rgba(0, 61, 122, 0.16);
+}
+
+.home .btn-icon {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: transform 0.25s ease;
+}
+
+.home .semester-actions .btn:hover .btn-icon {
+  transform: translateY(2px);
+}
+
+.home .semester-actions .btn.primary:hover .btn-icon {
+  transform: rotate(-12deg);
+}
+
+@media (max-width: 768px) {
+  .home .hero {
+    padding: 28px 20px 26px;
+  }
+
+  .home .manual-btn {
+    width: 100%;
+  }
+}
+
+/* 움직임 줄이기를 켠 사용자에게는 애니메이션을 끈다 */
+@media (prefers-reduced-motion: reduce) {
+  .home *,
+  .home *::before,
+  .home *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}
